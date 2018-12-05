@@ -11,7 +11,6 @@
 #define COLOR_ORDER GRB
 CRGB leds_1[NUM_LEDS];
 CRGB leds_2[NUM_LEDS];
-#define UPDATES_PER_SECOND 100
 
 EthernetUDP udp;
 
@@ -116,7 +115,4 @@ void loop() {
     udp.stop();
     udp.begin(5000);
   }
-
-//  FastLED.delay(1000 / UPDATES_PER_SECOND);
-
 }
