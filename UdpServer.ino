@@ -11,6 +11,12 @@
 #define COLOR_ORDER GRB
 CRGB leds_1[NUM_LEDS];
 CRGB leds_2[NUM_LEDS];
+
+long heartBeatArray[] = {
+    50, 100, 15, 1200};
+int hbeatIndex = 1;   // this initialization is important or it starts on the "wrong foot"
+long prevMillis;
+
 char udp_read_buffer[64];
 EthernetUDP udp;
 
@@ -47,6 +53,9 @@ uint8_t read_address() {
 void setup() {
   // Not sure this is necessary
   delay(3000); // power-up safety delay
+
+  // Builtin LED
+  pinMode(PC13, OUTPUT);
 
   // Necessary to use PA15 and PB3 for LED output.
   // Defaults to being used for JTAG
@@ -118,5 +127,23 @@ void loop() {
     // stop start is necessary for other clients to connect, but do we really need it?
     udp.stop();
     udp.begin(5000);
+  }
+
+   heartBeat(1.0);
+}
+
+void heartBeat(float tempo){
+  if ((millis() - prevMillis) > (long)(heartBeatArray[hbeatIndex] * tempo)){
+    hbeatIndex++;
+    if (hbeatIndex > 3) hbeatIndex = 0;
+
+    if ((hbeatIndex % 2) == 0){
+      digitalWrite(PC13, HIGH);
+      delay((int)heartBeatArray[hbeatIndex]);
+      digitalWrite(PC13, LOW);
+    }
+    hbeatIndex++;
+    // Serial.println(hbeatIndex);
+    prevMillis = millis();
   }
 }
