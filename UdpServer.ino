@@ -11,7 +11,7 @@
 #define COLOR_ORDER GRB
 CRGB leds_1[NUM_LEDS];
 CRGB leds_2[NUM_LEDS];
-
+char udp_read_buffer[64];
 EthernetUDP udp;
 
 #define IPADDRESS 192,168,1
@@ -88,15 +88,14 @@ void loop() {
           udp.read(message, size + 1);
           memcpy(leds_1, message, sizeof(CRGB) * 2 * 60);
           memcpy(leds_2, message, sizeof(CRGB) * 2 * 60);
-        } else {
-          char* msg = (char*)malloc(size+1);
-          int len = udp.read(msg,size+1);
-          msg[len]=0;
+        } else if (size < sizeof(udp_read_buffer)) {
+          int len = udp.read(udp_read_buffer, size + 1);
+          udp_read_buffer[len]=0;
 #ifdef DEBUG_OUTPUT
-          Serial.println(msg);
+          Serial.println(udp_read_buffer);
 #endif
           CRGB set_value;
-          switch(msg[0]) {
+          switch(udp_read_buffer[0]) {
             case 'r' : set_value = CRGB::Red; break;
             case 'g' : set_value = CRGB::Green; break;
             case 'b' : set_value = CRGB::Blue; break;
@@ -105,7 +104,12 @@ void loop() {
           for (int i = 0; i < NUM_LEDS; ++i) {
             leds_1[i] = set_value;
           }
-          free(msg);
+        } else {
+          // TODO(frk) : Handle this error
+          udp.flush();
+#ifdef DEBUG_OUTPUT
+          Serial.println("This is bad, recieved a packet too large to process, dropping on the floor");
+#endif
         }
     } while ((size = udp.available())>0);
     FastLED.show();
