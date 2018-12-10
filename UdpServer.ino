@@ -62,6 +62,7 @@ void setup() {
   FastLED.addLeds<LED_TYPE, LED_PIN_1, COLOR_ORDER>(leds_1, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE, LED_PIN_2, COLOR_ORDER>(leds_2, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);
+  FastLED.setDither(0);
 
   uint8_t address = read_address();
 
@@ -108,8 +109,14 @@ void loop() {
             case 'b' : set_value = CRGB::Blue; break;
             default : set_value = CRGB::White; break;
           }
+
+          int brightness = atoi(udp_read_buffer + 1);
+          if (brightness > 0 && brightness < 256)
+            FastLED.setBrightness(brightness);
+
           for (int i = 0; i < NUM_LEDS; ++i) {
             leds_1[i] = set_value;
+            leds_2[i] = set_value;
           }
         } else {
           // TODO(frk) : Handle this error
