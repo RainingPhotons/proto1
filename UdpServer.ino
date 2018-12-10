@@ -7,7 +7,7 @@
 #define LED_PIN_2   PA15
 #define NUM_LEDS    120
 #define BRIGHTNESS  64
-#define LED_TYPE    WS2811
+#define LED_TYPE    SK6812
 #define COLOR_ORDER GRB
 CRGB leds_1[NUM_LEDS];
 CRGB leds_2[NUM_LEDS];
