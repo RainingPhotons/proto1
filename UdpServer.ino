@@ -12,10 +12,8 @@
 CRGB leds_1[NUM_LEDS];
 CRGB leds_2[NUM_LEDS];
 
-long heartBeatArray[] = {
-    50, 100, 15, 1200};
-int hbeatIndex = 1;   // this initialization is important or it starts on the "wrong foot"
-long prevMillis;
+static const long kLedRefreshMillis = 10;
+unsigned long previousMillis = 0;
 
 char udp_read_buffer[64];
 EthernetUDP udp;
@@ -121,7 +119,6 @@ void loop() {
 #endif
         }
     } while ((size = udp.available())>0);
-    FastLED.show();
     //finish reading this packet:
     udp.flush();
     // stop start is necessary for other clients to connect, but do we really need it?
@@ -129,21 +126,16 @@ void loop() {
     udp.begin(5000);
   }
 
-   heartBeat(1.0);
+   showLEDS();
 }
 
-void heartBeat(float tempo){
-  if ((millis() - prevMillis) > (long)(heartBeatArray[hbeatIndex] * tempo)){
-    hbeatIndex++;
-    if (hbeatIndex > 3) hbeatIndex = 0;
+void showLEDS(){
+  unsigned long currentMillis = millis();
 
-    if ((hbeatIndex % 2) == 0){
-      digitalWrite(PC13, HIGH);
-      delay((int)heartBeatArray[hbeatIndex]);
-      digitalWrite(PC13, LOW);
-    }
-    hbeatIndex++;
-    // Serial.println(hbeatIndex);
-    prevMillis = millis();
+  if (currentMillis - previousMillis >= kLedRefreshMillis) {
+    // save the last time you blinked the LED
+    previousMillis = currentMillis;
+
+    FastLED.show();
   }
 }
