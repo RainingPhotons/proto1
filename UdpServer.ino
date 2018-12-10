@@ -12,9 +12,6 @@
 CRGB leds_1[NUM_LEDS];
 CRGB leds_2[NUM_LEDS];
 
-static const long kLedRefreshMillis = 10;
-unsigned long previousMillis = 0;
-
 char udp_read_buffer[64];
 EthernetUDP udp;
 
@@ -61,7 +58,6 @@ void setup() {
 
   FastLED.addLeds<LED_TYPE, LED_PIN_1, COLOR_ORDER>(leds_1, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE, LED_PIN_2, COLOR_ORDER>(leds_2, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.setBrightness(BRIGHTNESS);
   FastLED.setDither(0);
 
   uint8_t address = read_address();
@@ -114,10 +110,15 @@ void loop() {
           if (brightness > 0 && brightness < 256)
             FastLED.setBrightness(brightness);
 
-          for (int i = 0; i < NUM_LEDS; ++i) {
+          for (int i = 0; i < NUM_LEDS; ++i)
             leds_1[i] = set_value;
+
+          FastLED[0].showLeds(brightness);
+
+          for (int i = 0; i < NUM_LEDS; ++i)
             leds_2[i] = set_value;
-          }
+
+          FastLED[1].showLeds(brightness);
         } else {
           // TODO(frk) : Handle this error
           udp.flush();
@@ -131,18 +132,5 @@ void loop() {
     // stop start is necessary for other clients to connect, but do we really need it?
     udp.stop();
     udp.begin(5000);
-  }
-
-   showLEDS();
-}
-
-void showLEDS(){
-  unsigned long currentMillis = millis();
-
-  if (currentMillis - previousMillis >= kLedRefreshMillis) {
-    // save the last time you blinked the LED
-    previousMillis = currentMillis;
-
-    FastLED.show();
   }
 }
