@@ -134,4 +134,17 @@ void loop() {
     udp.stop();
     udp.begin(5000);
   }
+
+  blinkLED(1000);
+}
+
+void blinkLED(long interval) {
+  static unsigned long previousMillis = 0;
+  unsigned long currentMillis = millis();
+
+  if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
+    digitalWrite(PC13, !digitalRead(PC13));
+  }
+
 }
