@@ -59,6 +59,7 @@ void setup() {
   FastLED.addLeds<LED_TYPE, LED_PIN_1, COLOR_ORDER>(leds_1, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE, LED_PIN_2, COLOR_ORDER>(leds_2, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setDither(0);
+  FastLED.show();
 
   uint8_t address = read_address();
 
